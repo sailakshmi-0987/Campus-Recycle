@@ -1,14 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 
-// ⬅️ Updated User type with ROLE
+
 export interface User {
   id: string;
   email: string;
   fullName: string;
-  collegeName: string;
+  collegeName?: string;
   phone?: string;
   role: "user" | "admin";
+  avatarUrl?: string;
 }
 
 interface AuthContextType {
@@ -27,7 +28,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// ⭐ Optional Login Helper
+
 export async function handleLogin(email: string, password: string) {
   if (!email || !password) {
     return { error: "Please enter both email and password." };
@@ -52,40 +53,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 🔄 Stay Logged In On Refresh
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
-        loadUserProfile(session.user.id);
+        await syncUserProfile(session.user);
+        await loadUserProfile(session.user.id);
       } else {
         setIsLoading(false);
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        (async () => {
-          if (session?.user) {
-            await loadUserProfile(session.user.id);
-          } else {
-            setUser(null);
-            setIsLoading(false);
-          }
-        })();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        await syncUserProfile(session.user);
+        await loadUserProfile(session.user.id);
+      } else {
+        setUser(null);
+        setIsLoading(false);
       }
-    );
+    });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  // ⭐ Load profile + role
+  
+  const syncUserProfile = async (authUser: any) => {
+    const { id, email, user_metadata } = authUser;
+
+    await supabase.from("profiles").upsert({
+      id,
+      email,
+      full_name: user_metadata?.full_name || user_metadata?.name || "User",
+      avatar_url: user_metadata?.avatar_url || null,
+      role: "user",
+    });
+  };
+
   const loadUserProfile = async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", userId)
-        .maybeSingle();
+        .single();
 
       if (error) throw error;
 
@@ -96,7 +109,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           fullName: data.full_name,
           collegeName: data.college_name,
           phone: data.phone,
-          role: data.role || "user", // ⭐ Ensure fallback
+          avatarUrl: data.avatar_url,
+          role: data.role || "user",
         });
       }
     } catch (error) {
@@ -106,34 +120,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // 🔐 Login
+ 
   const login = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-  if (error) throw error;
+    if (error) throw error;
 
-  if (data.user) {
-    // Load profile
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("is_banned")
-      .eq("id", data.user.id)
-      .single();
+    if (data.user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("is_banned")
+        .eq("id", data.user.id)
+        .single();
 
-    if (profile?.is_banned) {
-      await supabase.auth.signOut();
-      throw new Error("Your account has been banned by the admin.");
+      if (profile?.is_banned) {
+        await supabase.auth.signOut();
+        throw new Error("Your account has been banned by the admin.");
+      }
+
+      await loadUserProfile(data.user.id);
     }
+  };
 
-    await loadUserProfile(data.user.id);
-  }
-};
-
-
-  // 🆕 Signup
   const signup = async (
     email: string,
     password: string,
@@ -155,7 +166,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         full_name: fullName,
         college_name: collegeName,
         phone,
-        role: "user", // ⭐ Default role
+        role: "user",
       });
 
       if (profileError) throw profileError;
@@ -164,16 +175,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // 🚪 Logout
   const logout = async () => {
     await supabase.auth.signOut();
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, login, signup, logout, isLoading }}
-    >
+    <AuthContext.Provider value={{ user, login, signup, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
@@ -181,7 +189,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context)
-    throw new Error("useAuth must be used within an AuthProvider");
+  if (!context) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
   return context;
 }
