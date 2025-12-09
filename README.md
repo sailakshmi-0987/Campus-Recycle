@@ -1,22 +1,17 @@
+ HEAD
 # 🌿 Campus Recycle – Your College Mini Marketplace
 
 > “Why throw away, when someone next door may need it?”
-
----
 
 ## 📌 Overview
 
 **Campus Recycle** is a peer-to-peer web app built with the **MERN Stack (MongoDB → Supabase version)** that helps students **share, exchange, or donate** items they no longer need — directly within their campus community.  
 It promotes **sustainability, reusability, and student collaboration** while using **Supabase** for backend database and authentication.
 
----
-
 ## 💡 The Problem
 
 Many students have unused items — books, gadgets, clothes, furniture, stationery.  
 These often end up collecting dust or being discarded, while others spend money buying similar items.
-
----
 
 ## 🌍 Our Solution
 
@@ -25,8 +20,6 @@ Campus Recycle connects students in a **safe and trusted campus network** to:
 - 🔍 **Browse** available items by category.
 - 🤝 **Request** and **exchange** items directly with others.
 - 🌱 **Reduce waste** and promote sustainability through reusing.
-
----
 
 ## ⚙️ Tech Stack
 
@@ -39,8 +32,6 @@ Campus Recycle connects students in a **safe and trusted campus network** to:
 | **Storage** | Supabase Storage (for images) |
 | **Hosting** | Vercel / Render / Netlify |
 
----
-
 ## 🚀 Features
 
 - 🖼️ **Post Items** — Upload photos, add description, and specify category & location.  
@@ -50,7 +41,6 @@ Campus Recycle connects students in a **safe and trusted campus network** to:
 - 🔔 **Real-time Updates** — Instant item listing and request synchronization.  
 - ♻️ **Eco-Friendly Initiative** — Encourages recycling & sharing within the campus.
 
----
 
 ## 🧩 How It Works
 
@@ -66,12 +56,9 @@ Campus Recycle connects students in a **safe and trusted campus network** to:
 4. **Sustainable Impact**  
    Reduce waste and help build a circular campus economy.
 
----
-
 ## ⚡ Installation & Setup
 
 ### 1️⃣ Clone the Repository
-```bash
 git clone https://github.com/Shaik12597/recycle.git
 cd recycle
 2️⃣ Supabase Setup (Database & Auth)
@@ -152,3 +139,7 @@ npm start
 
 
 Then open 👉 http://localhost:3000
+
+# Campus-Recycle
+Campus Recycle is a smart sustainability platform designed for college campuses to promote a circular economy. The platform allows students to share unused items, request needed items, report lost &amp; found, chat securely, and earn eco-points for sustainable actions. 
+
