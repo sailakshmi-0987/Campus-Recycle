@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -40,6 +41,17 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
       setLoading(false);
     }
   };
+
+async function loginWithGoogle() {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: window.location.origin,
+    },
+  });
+
+  if (error) console.error(error);
+}
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -106,7 +118,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              placeholder="you@college.edu"
+              placeholder="you@gmail.com"
             />
           </div>
 
@@ -155,6 +167,24 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
           >
             {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
           </button>
+          <button
+  onClick={loginWithGoogle}
+  className="w-full flex items-center justify-center gap-3 p-2 border rounded-lg hover:bg-gray-100 mt-3 transition"
+>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 48 48"
+  >
+    <path fill="#EA4335" d="M24 9.5c3.54 0 6.73 1.22 9.24 3.22l6.9-6.9C35.9 2.34 30.28 0 24 0 14.61 0 6.51 5.38 2.56 13.22l8.04 6.26C12.52 13.09 17.8 9.5 24 9.5z"/>
+    <path fill="#4285F4" d="M46.1 24.5c0-1.64-.15-3.22-.43-4.76H24v9h12.4c-.54 2.9-2.18 5.36-4.64 7.02l7.12 5.52c4.16-3.84 6.22-9.5 6.22-16.78z"/>
+    <path fill="#FBBC05" d="M10.6 28.48c-.48-1.44-.76-2.98-.76-4.58s.28-3.14.76-4.58l-8.04-6.26C.9 16.64 0 20.23 0 23.9s.9 7.26 2.56 10.84l8.04-6.26z"/>
+    <path fill="#34A853" d="M24 48c6.28 0 11.9-2.06 15.86-5.6l-7.12-5.52c-1.98 1.34-4.52 2.14-8.74 2.14-6.2 0-11.48-3.6-13.4-8.74l-8.04 6.26C6.51 42.62 14.61 48 24 48z"/>
+  </svg>
+
+  <span className="font-medium">Continue with Google</span>
+</button>
+
         </div>
       </div>
     </div>
