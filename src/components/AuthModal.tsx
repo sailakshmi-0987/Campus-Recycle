@@ -77,7 +77,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  placeholder="John Doe"
+                  placeholder="bob bobby"
                 />
               </div>
               <div>
@@ -134,7 +134,7 @@ export function AuthModal({ isOpen, onClose, initialMode = 'login' }: AuthModalP
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                placeholder="+1 234 567 8900"
+                placeholder="+91 8456723490"
               />
             </div>
           )}
